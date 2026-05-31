@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Subscription OOP Polymorphism Visualizer</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-slate-950 text-slate-100">
+  <main class="mx-auto max-w-7xl px-5 py-8">
+    <section class="mb-8 overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-slate-900 to-cyan-950/70 p-7 shadow-2xl ring-1 ring-slate-700">
+      <p class="mb-2 text-sm font-semibold text-cyan-300">자료구조 과제 2 · OOP 웹앱</p>
+      <h1 class="text-3xl font-bold tracking-tight md:text-4xl">구독 플랜 상속 구조와 다형성 시각화</h1>
+      <p class="mt-3 max-w-4xl text-slate-300">
+        SubscriptionADT → Subscription → Free/Basic/Standard/Premium 구조를 웹에서 시각화했습니다.
+        각 플랜을 클릭하면 오버라이딩된 메서드가 실행됩니다.
+      </p>
+    </section>
+
+    <section class="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+      <section class="rounded-3xl bg-slate-900/80 p-6 shadow-xl ring-1 ring-slate-700">
+        <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 class="text-2xl font-bold">상속 구조</h2>
+            <p class="mt-1 text-sm text-slate-400">ADT → Base Class → Instances</p>
+          </div>
+          <button id="resetBtn" class="rounded-full bg-slate-800 px-4 py-2 text-sm font-semibold transition hover:bg-slate-700">
+            초기화
+          </button>
+        </div>
+
+        <div class="flex flex-col items-center gap-4">
+          <button data-node="SubscriptionADT" class="node w-full max-w-sm rounded-2xl border border-purple-400/60 bg-purple-950/50 p-4 text-left shadow-lg transition hover:-translate-y-1 hover:bg-purple-900/70">
+            <span class="text-xs font-semibold text-purple-200">abstract class</span>
+            <h3 class="text-xl font-bold">SubscriptionADT</h3>
+            <p class="text-sm text-purple-100/80">공통 속성과 메서드 형식 정의</p>
+          </button>
+
+          <div class="h-8 w-px bg-slate-600"></div>
+
+          <button data-node="Subscription" class="node w-full max-w-sm rounded-2xl border border-cyan-400/60 bg-cyan-950/50 p-4 text-left shadow-lg transition hover:-translate-y-1 hover:bg-cyan-900/70">
+            <span class="text-xs font-semibold text-cyan-200">base class</span>
+            <h3 class="text-xl font-bold">Subscription</h3>
+            <p class="text-sm text-cyan-100/80">기본 구독 기능 구현</p>
+          </button>
+
+          <div class="grid w-full grid-cols-4 items-center gap-2 px-4">
+            <div class="h-px bg-slate-600"></div>
+            <div class="h-px bg-slate-600"></div>
+            <div class="h-px bg-slate-600"></div>
+            <div class="h-px bg-slate-600"></div>
+          </div>
+
+          <div id="planCards" class="grid w-full gap-4 md:grid-cols-2 xl:grid-cols-4"></div>
+        </div>
+      </section>
+
+      <aside class="rounded-3xl bg-slate-900/80 p-6 shadow-xl ring-1 ring-slate-700">
+        <div class="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h2 class="text-2xl font-bold">실행 결과</h2>
+            <p class="mt-1 text-sm text-slate-400">클릭하면 오버라이딩 메서드 결과가 출력됩니다.</p>
+          </div>
+          <div class="rounded-full bg-slate-950 p-1 ring-1 ring-slate-700">
+            <button id="monthlyBtn" class="price-toggle rounded-full px-3 py-1 text-sm font-semibold">월간</button>
+            <button id="yearlyBtn" class="price-toggle rounded-full px-3 py-1 text-sm font-semibold">연간</button>
+          </div>
+        </div>
+
+        <div id="resultBox" class="mt-5 min-h-72 rounded-2xl border border-slate-700 bg-slate-950 p-5">
+          <p class="text-slate-400">왼쪽의 클래스 노드나 구독 플랜 카드를 클릭해보세요.</p>
+        </div>
+
+        <div class="mt-5 rounded-2xl bg-slate-800/70 p-4">
+          <h3 class="font-bold text-cyan-200">다형성 포인트</h3>
+          <p class="mt-2 text-sm text-slate-300">
+            같은 <code class="rounded bg-slate-950 px-1">yearlySubscription()</code>을 호출해도
+            Free/Basic은 “연간 구독 미제공”, Standard/Premium은 “20% 할인 연간 구독”을 출력합니다.
+          </p>
+        </div>
+      </aside>
+    </section>
+
+    <section class="mt-6 grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
+      <section class="rounded-3xl bg-slate-900/80 p-6 shadow-xl ring-1 ring-slate-700">
+        <h2 class="text-2xl font-bold">추천 플랜 찾기</h2>
+        <p class="mt-1 text-sm text-slate-400">사용자 조건에 따라 가장 적합한 객체를 추천합니다.</p>
+
+        <div class="mt-5 space-y-3 text-sm">
+          <label class="flex items-center gap-3 rounded-2xl bg-slate-950 p-3 ring-1 ring-slate-700">
+            <input id="needNoAd" type="checkbox" class="h-4 w-4 accent-cyan-400" /> 광고 없이 보고 싶어요.
+          </label>
+          <label class="flex items-center gap-3 rounded-2xl bg-slate-950 p-3 ring-1 ring-slate-700">
+            <input id="need4k" type="checkbox" class="h-4 w-4 accent-cyan-400" /> 4K 화질이 필요해요.
+          </label>
+          <label class="flex items-center gap-3 rounded-2xl bg-slate-950 p-3 ring-1 ring-slate-700">
+            <input id="needFamily" type="checkbox" class="h-4 w-4 accent-cyan-400" /> 가족/친구와 함께 쓸 거예요.
+          </label>
+          <label class="flex items-center gap-3 rounded-2xl bg-slate-950 p-3 ring-1 ring-slate-700">
+            <input id="needCheap" type="checkbox" class="h-4 w-4 accent-cyan-400" /> 가장 저렴한 플랜이 좋아요.
+          </label>
+        </div>
+
+        <button id="recommendBtn" class="mt-5 w-full rounded-2xl bg-cyan-500 px-5 py-3 font-bold text-slate-950 transition hover:bg-cyan-300">
+          내게 맞는 플랜 추천받기
+        </button>
+
+        <div id="recommendBox" class="mt-4 rounded-2xl border border-slate-700 bg-slate-950 p-4 text-sm text-slate-300">
+          조건을 선택한 뒤 추천 버튼을 눌러보세요.
+        </div>
+      </section>
+
+      <section class="rounded-3xl bg-slate-900/80 p-6 shadow-xl ring-1 ring-slate-700">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 class="text-2xl font-bold">플랜 비교표</h2>
+            <p class="mt-1 text-sm text-slate-400">실제 서비스처럼 정보를 한눈에 비교할 수 있습니다.</p>
+          </div>
+          <span id="priceModeLabel" class="rounded-full bg-amber-400/15 px-3 py-1 text-xs font-bold text-amber-200 ring-1 ring-amber-300/30">월간 가격 기준</span>
+        </div>
+        <div class="mt-5 overflow-x-auto rounded-2xl ring-1 ring-slate-700">
+          <table class="w-full min-w-[720px] border-collapse text-left text-sm">
+            <thead class="bg-slate-950 text-slate-300">
+              <tr>
+                <th class="p-4">항목</th>
+                <th class="p-4">Free</th>
+                <th class="p-4">Basic</th>
+                <th class="p-4">Standard</th>
+                <th class="p-4">Premium</th>
+              </tr>
+            </thead>
+            <tbody id="compareBody" class="divide-y divide-slate-800 bg-slate-900"></tbody>
+          </table>
+        </div>
+      </section>
+    </section>
+
+    <section class="mt-6 rounded-3xl bg-slate-900/80 p-6 shadow-xl ring-1 ring-slate-700">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 class="text-2xl font-bold">클릭 로그</h2>
+          <p class="mt-1 text-sm text-slate-400">사용자가 실행한 다형성 인터랙션을 기록합니다.</p>
+        </div>
+        <button id="clearLogBtn" class="rounded-full bg-slate-800 px-4 py-2 text-sm font-semibold transition hover:bg-slate-700">로그 지우기</button>
+      </div>
+      <ol id="logList" class="mt-4 space-y-2 text-sm text-slate-300">
+        <li class="text-slate-500">아직 실행 기록이 없습니다.</li>
+      </ol>
+    </section>
+  </main>
+
+  <script>
+    class SubscriptionADT {
+      constructor() {
+        if (new.target === SubscriptionADT) {
+          throw new Error("SubscriptionADT는 추상 클래스처럼 직접 생성할 수 없습니다.");
+        }
+      }
+      getFeatures() { throw new Error("getFeatures()를 반드시 구현해야 합니다."); }
+      yearlySubscription() { throw new Error("yearlySubscription()을 반드시 구현해야 합니다."); }
+      subscribe() { throw new Error("subscribe()를 반드시 구현해야 합니다."); }
+    }
+
+    class Subscription extends SubscriptionADT {
+      constructor(name, price, hasAd, resolution, deviceLimit, downloadLimit) {
+        super();
+        this.planName = name;
+        this.planPrice = price;
+        this.planHasAd = hasAd;
+        this.planMaxResolution = resolution;
+        this.planDeviceLimit = deviceLimit;
+        this.planDownloadLimit = downloadLimit;
+      }
+      getFeatures() {
+        return `${this.planName}\n월 ${this.planPrice.toLocaleString()}원\n동시시청 ${this.planDeviceLimit}대 | ${this.planMaxResolution} | 콘텐츠 다운로드 ${this.planDownloadLimit}회 | 광고 ${this.planHasAd}`;
+      }
+      yearlySubscription() {
+        return `${this.planName}은 연간구독 서비스를 제공하지 않습니다.`;
+      }
+      subscribe() {
+        return `${this.planName} 구독이 시작되었습니다.`;
+      }
+      getDisplayPrice(mode) {
+        if (mode === "monthly") return `월 ${this.planPrice.toLocaleString()}원`;
+        return this.yearlySubscription();
+      }
+    }
+
+    class FreePlan extends Subscription {
+      constructor() { super("Free Plan", 0, "O", "720p", 1, 0); }
+    }
+    class BasicPlan extends Subscription {
+      constructor() { super("Basic Plan", 9500, "X", "720p", 1, 200); }
+    }
+    class StandardPlan extends Subscription {
+      constructor() { super("Standard Plan", 13500, "X", "1080p", 2, 300); }
+      yearlySubscription() {
+        const originalPrice = this.planPrice * 12;
+        const salePrice = Math.floor(originalPrice * 0.8);
+        return `연 ${salePrice.toLocaleString()}원 (20% 할인, 원가 ${originalPrice.toLocaleString()}원)`;
+      }
+    }
+    class PremiumPlan extends Subscription {
+      constructor() { super("Premium Plan", 17000, "X", "2160p", 4, 400); }
+      getFeatures() {
+        return `${this.planName}\n월 ${this.planPrice.toLocaleString()}원\n동시시청 ${this.planDeviceLimit}대 | ${this.planMaxResolution} | 콘텐츠 다운로드 ${this.planDownloadLimit}회 | Apple TV 제공 | 광고 ${this.planHasAd}`;
+      }
+      yearlySubscription() {
+        const originalPrice = this.planPrice * 12;
+        const salePrice = Math.floor(originalPrice * 0.8);
+        return `연 ${salePrice.toLocaleString()}원 (20% 할인, 원가 ${originalPrice.toLocaleString()}원)`;
+      }
+    }
+
+    const plans = [new FreePlan(), new BasicPlan(), new StandardPlan(), new PremiumPlan()];
+    const planCards = document.getElementById("planCards");
+    const resultBox = document.getElementById("resultBox");
+    const resetBtn = document.getElementById("resetBtn");
+    const monthlyBtn = document.getElementById("monthlyBtn");
+    const yearlyBtn = document.getElementById("yearlyBtn");
+    const compareBody = document.getElementById("compareBody");
+    const priceModeLabel = document.getElementById("priceModeLabel");
+    const recommendBtn = document.getElementById("recommendBtn");
+    const recommendBox = document.getElementById("recommendBox");
+    const logList = document.getElementById("logList");
+    const clearLogBtn = document.getElementById("clearLogBtn");
+
+    let priceMode = "monthly";
+    let selectedPlanName = null;
+    const logs = [];
+
+    const badgeClass = {
+      "Free Plan": "bg-emerald-500/15 text-emerald-200 ring-emerald-400/30",
+      "Basic Plan": "bg-sky-500/15 text-sky-200 ring-sky-400/30",
+      "Standard Plan": "bg-amber-500/15 text-amber-200 ring-amber-400/30",
+      "Premium Plan": "bg-pink-500/15 text-pink-200 ring-pink-400/30"
+    };
+
+    function shortName(plan) {
+      return plan.planName.replace(" Plan", "");
+    }
+
+    function addLog(text) {
+      logs.unshift(text);
+      if (logs.length > 6) logs.pop();
+      renderLogs();
+    }
+
+    function renderLogs() {
+      if (logs.length === 0) {
+        logList.innerHTML = `<li class="text-slate-500">아직 실행 기록이 없습니다.</li>`;
+        return;
+      }
+      logList.innerHTML = logs.map((log, index) => `
+        <li class="rounded-2xl bg-slate-950 p-3 ring-1 ring-slate-800">
+          <span class="mr-2 font-bold text-cyan-300">${index + 1}.</span>${log}
+        </li>
+      `).join("");
+    }
+
+    function setActivePriceToggle() {
+      [monthlyBtn, yearlyBtn].forEach(btn => btn.className = "price-toggle rounded-full px-3 py-1 text-sm font-semibold text-slate-400");
+      const active = priceMode === "monthly" ? monthlyBtn : yearlyBtn;
+      active.className = "price-toggle rounded-full bg-cyan-400 px-3 py-1 text-sm font-bold text-slate-950";
+      priceModeLabel.textContent = priceMode === "monthly" ? "월간 가격 기준" : "연간 구독 기준";
+    }
+
+    function printResult(title, body, extra = "") {
+      resultBox.innerHTML = `
+        <div class="rounded-full bg-cyan-300/20 px-3 py-1 text-xs font-semibold text-cyan-200 w-fit">method called</div>
+        <h3 class="mt-4 text-2xl font-bold">${title}</h3>
+        <pre class="mt-4 whitespace-pre-wrap rounded-2xl bg-slate-900 p-4 text-sm leading-7 text-slate-100">${body}</pre>
+        ${extra ? `<p class="mt-4 text-sm text-slate-300">${extra}</p>` : ""}
+      `;
+    }
+
+    function renderCards() {
+      planCards.innerHTML = "";
+      plans.forEach((plan) => {
+        const isSelected = selectedPlanName === plan.planName;
+        const card = document.createElement("button");
+        card.className = `node rounded-2xl border p-4 text-left shadow-lg transition hover:-translate-y-1 ${
+          isSelected
+            ? "border-cyan-300 bg-cyan-950/60 ring-2 ring-cyan-300/50"
+            : "border-slate-700 bg-slate-800/80 hover:border-cyan-400 hover:bg-slate-800"
+        }`;
+        card.innerHTML = `
+          <span class="rounded-full px-2 py-1 text-xs font-bold ring-1 ${badgeClass[plan.planName]}">instance</span>
+          <h3 class="mt-3 text-lg font-bold">${plan.planName}</h3>
+          <p class="mt-2 text-sm text-slate-300">${plan.planMaxResolution} · ${plan.planDeviceLimit}대 · ${plan.getDisplayPrice(priceMode)}</p>
+          <p class="mt-3 text-xs text-slate-400">클릭 → getFeatures(), yearlySubscription(), subscribe()</p>
+        `;
+
+        card.addEventListener("click", () => selectPlan(plan));
+        planCards.appendChild(card);
+      });
+    }
+
+    function selectPlan(plan) {
+      selectedPlanName = plan.planName;
+      const result = `[getFeatures()]\n${plan.getFeatures()}\n\n[yearlySubscription()]\n${plan.yearlySubscription()}\n\n[subscribe()]\n${plan.subscribe()}`;
+      printResult(plan.planName, result, "같은 메서드 이름을 호출했지만 객체의 실제 클래스에 따라 결과가 다르게 나타납니다.");
+      addLog(`${plan.planName} 클릭 → 오버라이딩 메서드 실행 결과 확인`);
+      renderCards();
+    }
+
+    function renderCompareTable() {
+      const rows = [
+        ["가격", ...plans.map(plan => plan.getDisplayPrice(priceMode))],
+        ["광고", ...plans.map(plan => plan.planHasAd === "O" ? "있음" : "없음")],
+        ["최대 화질", ...plans.map(plan => plan.planMaxResolution)],
+        ["동시 시청", ...plans.map(plan => `${plan.planDeviceLimit}대`)],
+        ["다운로드", ...plans.map(plan => `${plan.planDownloadLimit}회`)],
+        ["추가 혜택", "기본 이용", "광고 제거", "FHD + 2인 이용", "4K + Apple TV"]
+      ];
+
+      compareBody.innerHTML = rows.map(row => `
+        <tr class="transition hover:bg-slate-800/70">
+          ${row.map((cell, index) => `<td class="p-4 ${index === 0 ? "font-bold text-cyan-200" : "text-slate-300"}">${cell}</td>`).join("")}
+        </tr>
+      `).join("");
+    }
+
+    function recommendPlan() {
+      const needNoAd = document.getElementById("needNoAd").checked;
+      const need4k = document.getElementById("need4k").checked;
+      const needFamily = document.getElementById("needFamily").checked;
+      const needCheap = document.getElementById("needCheap").checked;
+
+      let plan;
+      let reason;
+
+      if (need4k || (needFamily && !needCheap)) {
+        plan = plans.find(p => p.planName === "Premium Plan");
+        reason = "4K 화질, 4명 동시 시청, Apple TV 제공 조건에 가장 잘 맞습니다.";
+      } else if (needFamily) {
+        plan = plans.find(p => p.planName === "Standard Plan");
+        reason = "Premium보다 저렴하면서 2명 동시 시청과 1080p 화질을 제공합니다.";
+      } else if (needNoAd && needCheap) {
+        plan = plans.find(p => p.planName === "Basic Plan");
+        reason = "광고가 없으면서 가장 낮은 유료 가격입니다.";
+      } else if (needNoAd) {
+        plan = plans.find(p => p.planName === "Basic Plan");
+        reason = "광고 제거가 필요하지만 혼자 사용한다면 Basic Plan이 효율적입니다.";
+      } else if (needCheap) {
+        plan = plans.find(p => p.planName === "Free Plan");
+        reason = "가격을 가장 중요하게 본다면 무료 플랜이 적합합니다.";
+      } else {
+        plan = plans.find(p => p.planName === "Standard Plan");
+        reason = "특별 조건이 없다면 가격과 기능의 균형이 좋은 Standard Plan을 추천합니다.";
+      }
+
+      recommendBox.innerHTML = `
+        <p class="text-xs font-bold text-cyan-300">추천 결과</p>
+        <h3 class="mt-2 text-xl font-bold text-white">${plan.planName}</h3>
+        <p class="mt-2 text-slate-300">${reason}</p>
+        <p class="mt-3 rounded-xl bg-slate-900 p-3 text-slate-200">${plan.getDisplayPrice(priceMode)}</p>
+      `;
+      selectPlan(plan);
+      addLog(`추천 플랜 찾기 → ${plan.planName} 추천`);
+    }
+
+    document.querySelectorAll("[data-node]").forEach((node) => {
+      node.addEventListener("click", () => {
+        selectedPlanName = null;
+        const nodeName = node.dataset.node;
+        if (nodeName === "SubscriptionADT") {
+          printResult("SubscriptionADT", "추상 클래스 역할\n- planName, planPrice 등 속성 형식 정의\n- getFeatures(), yearlySubscription(), subscribe() 메서드 구현 강제", "Python의 ABC/abstractmethod 구조를 웹에서는 JS 클래스로 표현했습니다.");
+          addLog("SubscriptionADT 클릭 → 추상 클래스 역할 확인");
+        } else {
+          const base = new Subscription("Sample Plan", 1000, "X", "720p", 1, 10);
+          printResult("Subscription", `[getFeatures()]\n${base.getFeatures()}\n\n[yearlySubscription()]\n${base.yearlySubscription()}\n\n[subscribe()]\n${base.subscribe()}`, "자식 클래스들이 이 기본 기능을 상속하거나 오버라이딩합니다.");
+          addLog("Subscription 클릭 → 기본 클래스 메서드 확인");
+        }
+        renderCards();
+      });
+    });
+
+    monthlyBtn.addEventListener("click", () => {
+      priceMode = "monthly";
+      setActivePriceToggle();
+      renderCards();
+      renderCompareTable();
+      addLog("가격 토글 → 월간 가격 기준으로 변경");
+    });
+
+    yearlyBtn.addEventListener("click", () => {
+      priceMode = "yearly";
+      setActivePriceToggle();
+      renderCards();
+      renderCompareTable();
+      addLog("가격 토글 → yearlySubscription() 기준으로 변경");
+    });
+
+    recommendBtn.addEventListener("click", recommendPlan);
+
+    resetBtn.addEventListener("click", () => {
+      selectedPlanName = null;
+      priceMode = "monthly";
+      resultBox.innerHTML = `<p class="text-slate-400">왼쪽의 클래스 노드나 구독 플랜 카드를 클릭해보세요.</p>`;
+      recommendBox.textContent = "조건을 선택한 뒤 추천 버튼을 눌러보세요.";
+      document.querySelectorAll("input[type='checkbox']").forEach(input => input.checked = false);
+      setActivePriceToggle();
+      renderCards();
+      renderCompareTable();
+      addLog("초기화 버튼 클릭");
+    });
+
+    clearLogBtn.addEventListener("click", () => {
+      logs.length = 0;
+      renderLogs();
+    });
+
+    setActivePriceToggle();
+    renderCards();
+    renderCompareTable();
+  </script>
+</body>
+</html>
